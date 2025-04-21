@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nova Launch</title>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/browser/index.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #0b0c10, #1f2833);
+      color: #fff;
+    }
+    header {
+      background-color: #45a29e;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    nav a {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    .hero h2 {
+      font-size: 2.5rem;
+    }
+    .btn {
+      background: #66fcf1;
+      color: #0b0c10;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    .section {
+      padding: 3rem 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    .card {
+      background: #1f2833;
+      border: 1px solid #45a29e;
+      padding: 2rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background-color: #0b0c10;
+      color: #ccc;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #1f2833;
+      padding: 2rem;
+      border-radius: 8px;
+      border: 1px solid #45a29e;
+      width: 90%;
+      max-width: 400px;
+    }
+    .modal-content h4 {
+      margin-top: 0;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.5rem 0 1rem;
+      border: none;
+      border-radius: 4px;
+    }
+    .close-btn {
+      background: #ff5e5e;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Nova Launch</h1>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#presale">Presale</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#create">Create Token</a>
+      <a href="#connect">Connect</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>Empowering the Next Generation of Tokens</h2>
+    <p>Join our secure and decentralized token launchpad. Early access now open.</p>
+    <button class="btn">Join Presale</button>
+  </section>
+
+  <section id="about" class="section">
+    <div class="card">
+      <h3>About Nova Launch</h3>
+      <p>Nova Launch provides an all-in-one platform for launching and promoting your crypto projects. From token creation to liquidity lock, we’ve got you covered.</p>
+    </div>
+  </section>
+
+  <section id="presale" class="section">
+    <div class="card">
+      <h3>Presale Details</h3>
+      <p>Starts: April 28th, 2025<br/> Soft Cap: 200 ETH<br/> Hard Cap: 800 ETH</p>
+      <p>Remaining Time: <strong>6d 12h 34m</strong></p>
+    </div>
+  </section>
+
+  <section id="roadmap" class="section">
+    <div class="card">
+      <h3>Roadmap</h3>
+      <ul>
+        <li>Q2 2025 - Platform Launch</li>
+        <li>Q3 2025 - Partner Integrations</li>
+        <li>Q4 2025 - Governance Token Release</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="create" class="section">
+    <div class="card">
+      <h3>Create Your Token</h3>
+      <p>Launch your own token on Solana. Customize name, symbol, total supply. Phantom wallet required.</p>
+      <button class="btn" onclick="document.getElementById('tokenModal').style.display='flex'">Start Token Creation</button>
+    </div>
+  </section>
+
+  <section id="connect" class="section">
+    <div class="card">
+      <h3>Connect Your Wallet</h3>
+      <p>To participate in presales, please connect your Phantom wallet.</p>
+      <button class="btn" onclick="connectWallet()">Connect Wallet</button>
+      <p id="walletAddress"></p>
+    </div>
+  </section>
+
+  <div class="modal" id="tokenModal">
+    <div class="modal-content">
+      <h4>Create Token</h4>
+      <input type="text" id="tokenName" placeholder="Token Name" />
+      <input type="text" id="tokenSymbol" placeholder="Token Symbol" />
+      <input type="number" id="tokenSupply" placeholder="Total Supply" />
+      <input type="number" id="tokenDecimals" placeholder="Decimals (usually 9)" />
+      <button class="btn" onclick="createToken()">Create Token</button>
+      <button class="close-btn" onclick="document.getElementById('tokenModal').style.display='none'">Close</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Nova Launch. All rights reserved.</p>
+  </footer>
+
+  <script>
+    async function connectWallet() {
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const resp = await window.solana.connect();
+          document.getElementById("walletAddress").innerText = `Connected: ${resp.publicKey.toString()}`;
+        } catch (err) {
+          console.error("Wallet connection failed", err);
+        }
+      } else {
+        alert("Phantom Wallet not found! Please install it.");
+      }
+    }
+
+    async function createToken() {
+      const { Connection, clusterApiUrl, Keypair, LAMPORTS_PER_SOL } = solanaWeb3;
+      const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
+      const provider = window.solana;
+
+      if (!provider?.publicKey) {
+        alert("Please connect your Phantom wallet first.");
+        return;
+      }
+
+      const tokenName = document.getElementById('tokenName').value;
+      const tokenSymbol = document.getElementById('tokenSymbol').value;
+      const tokenSupply = Number(document.getElementById('tokenSupply').value);
+      const tokenDecimals = Number(document.getElementById('tokenDecimals').value);
+
+      const mint = await splToken.createMint(
+        connection,
+        provider, // Phantom injects the signer
+        provider.publicKey,
+        null,
+        tokenDecimals
+      );
+
+      const tokenAccount = await splToken.getOrCreateAssociatedTokenAccount(
+        connection,
+        provider,
+        mint,
+        provider.publicKey
+      );
+
+      await splToken.mintTo(
+        connection,
+        provider,
+        mint,
+        tokenAccount.address,
+        provider.publicKey,
+        tokenSupply * Math.pow(10, tokenDecimals)
+      );
+
+      alert(`Token Created! Mint Address: ${mint.toBase58()}`);
+    }
+  </script>
+</body>
+</html>
